@@ -43,24 +43,24 @@ const Contacto = mongoose.model('Contacto', new mongoose.Schema({
   fecha: { type: Date, default: Date.now }
 }));
 
-// --- CONFIGURACIÓN DE CORREO OPTIMIZADA PARA RENDER ---
+// --- CONFIGURACIÓN DE CORREO MEJORADA (PUERTO 587 PARA RENDER) ---
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
-  port: 465,
-  secure: true, // Usa SSL
+  port: 587,
+  secure: false, // false para puerto 587
   auth: {
     user: 'drokuas@gmail.com', 
-    pass: 'bjpz fups jvsi uajz' // Clave de aplicación de 16 letras
+    pass: 'bjpz fups jvsi uajz' 
   },
   tls: {
-    rejectUnauthorized: false // Evita bloqueos de certificados en la nube
+    rejectUnauthorized: false
   }
 });
 
 // Verificar conexión del correo al iniciar
 transporter.verify((error, success) => {
-  if (error) console.log("❌ Error en configuración de correo:", error);
-  else console.log("📧 Servidor de correo listo para enviar");
+  if (error) console.log("❌ Error en configuración de correo (SMTP):", error);
+  else console.log("📧 Servidor de correo conectado y listo");
 });
 
 // --- MIDDLEWARE DE AUTENTICACIÓN ---
@@ -101,7 +101,7 @@ app.get('/api/resenas', async (req, res) => res.json(await Resena.find()));
 app.post('/api/resenas', async (req, res) => res.json(await new Resena(req.body).save()));
 app.delete('/api/resenas/:id', auth, async (req, res) => res.json(await Resena.findByIdAndDelete(req.params.id)));
 
-// --- RUTA DE CONTACTO CORREGIDA (CON TIEMPO DE ESPERA) ---
+// --- RUTA DE CONTACTO ---
 app.post('/api/contacto', async (req, res) => {
   console.log("📨 Nueva petición de contacto recibida...");
   try {
@@ -110,25 +110,27 @@ app.post('/api/contacto', async (req, res) => {
     // 1. Guardar en Base de Datos
     const nuevaConsulta = new Contacto({ nombre, email, mensaje });
     await nuevaConsulta.save();
-    console.log("💾 Consulta guardada en MongoDB");
 
     // 2. Enviar Email
     const mailOptions = {
-      from: `"EMPREWEB" <drokuas@gmail.com>`,
+      from: `"EMPREWEB NOTIFICADOR" <drokuas@gmail.com>`,
       to: 'drokuas@gmail.com', 
       subject: `🚀 Nueva consulta de ${nombre}`,
       html: `
-        <h3>Nueva solicitud de proyecto</h3>
-        <p><b>Nombre:</b> ${nombre}</p>
-        <p><b>Email:</b> ${email}</p>
-        <p><b>Mensaje:</b> ${mensaje}</p>
+        <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd;">
+          <h2 style="color: #4f46e5;">Nueva solicitud de proyecto</h2>
+          <p><b>Nombre:</b> ${nombre}</p>
+          <p><b>Email del cliente:</b> ${email}</p>
+          <p><b>Mensaje:</b> ${mensaje}</p>
+          <hr>
+          <p style="font-size: 0.8em; color: #777;">Enviado desde el sistema EMPREWEB</p>
+        </div>
       `
     };
 
     await transporter.sendMail(mailOptions);
     console.log("✅ Correo enviado correctamente");
 
-    // 3. Responder al cliente (Frontend)
     res.json({ message: "Consulta guardada y correo enviado exitosamente" });
 
   } catch (error) {
