@@ -43,25 +43,28 @@ const Contacto = mongoose.model('Contacto', new mongoose.Schema({
   fecha: { type: Date, default: Date.now }
 }));
 
-// --- CONFIGURACIÓN DE CORREO PROTEGIDA (USANDO VARIABLES DE ENTORNO) ---
-// Importante: Configura GMAIL_USER y GMAIL_PASS en el panel de Render
+// --- CONFIGURACIÓN DE CORREO REPARADA PARA RENDER (PUERTO 587) ---
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 587,
-  secure: false, 
+  secure: false, // Debe ser false para puerto 587
   auth: {
-    user: process.env.GMAIL_USER, // Ya no exponemos el correo aquí
-    pass: process.env.GMAIL_PASS  // Ya no exponemos la clave aquí
+    user: process.env.GMAIL_USER, 
+    pass: process.env.GMAIL_PASS 
   },
   tls: {
-    rejectUnauthorized: false
+    rejectUnauthorized: false, // Vital para evitar bloqueos en Render
+    minVersion: "TLSv1.2"
   }
 });
 
 // Verificar conexión del correo al iniciar
 transporter.verify((error, success) => {
-  if (error) console.log("❌ Error en configuración de correo (SMTP):", error);
-  else console.log("📧 Servidor de correo conectado y listo");
+  if (error) {
+    console.log("❌ Error persistente en SMTP:", error.message);
+  } else {
+    console.log("📧 Servidor de correo conectado y listo para enviar");
+  }
 });
 
 // --- MIDDLEWARE DE AUTENTICACIÓN ---
@@ -104,43 +107,35 @@ app.delete('/api/resenas/:id', auth, async (req, res) => res.json(await Resena.f
 
 // --- RUTA DE CONTACTO ---
 app.post('/api/contacto', async (req, res) => {
-  console.log("📨 Nueva petición de contacto recibida...");
   try {
     const { nombre, email, mensaje } = req.body;
 
-    // 1. Guardar en Base de Datos
     const nuevaConsulta = new Contacto({ nombre, email, mensaje });
     await nuevaConsulta.save();
 
-    // 2. Enviar Email
     const mailOptions = {
-      from: `"EMPREWEB NOTIFICADOR" <${process.env.GMAIL_USER}>`,
-      to: process.env.GMAIL_USER, // Te lo envías a ti mismo
+      from: `"EMPREWEB" <${process.env.GMAIL_USER}>`,
+      to: process.env.GMAIL_USER, 
       subject: `🚀 Nueva consulta de ${nombre}`,
       html: `
-        <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd;">
-          <h2 style="color: #4f46e5;">Nueva solicitud de proyecto</h2>
-          <p><b>Nombre:</b> ${nombre}</p>
-          <p><b>Email del cliente:</b> ${email}</p>
-          <p><b>Mensaje:</b> ${mensaje}</p>
-          <hr>
-          <p style="font-size: 0.8em; color: #777;">Enviado desde el sistema EMPREWEB</p>
+        <div style="font-family: sans-serif; border: 1px solid #eee; padding: 20px;">
+          <h2 style="color: #6366f1;">Nueva solicitud de proyecto</h2>
+          <p><strong>Nombre:</strong> ${nombre}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Mensaje:</strong> ${mensaje}</p>
         </div>
       `
     };
 
     await transporter.sendMail(mailOptions);
-    console.log("✅ Correo enviado correctamente");
-
-    res.json({ message: "Consulta guardada y correo enviado exitosamente" });
+    res.json({ message: "Consulta enviada exitosamente" });
 
   } catch (error) {
-    console.error("❌ Error en el proceso de contacto:", error);
-    res.status(500).json({ error: "Error al procesar la consulta: " + error.message });
+    console.error("❌ Error enviando email:", error);
+    res.status(500).json({ error: "Error al enviar el correo" });
   }
 });
 
-// --- INICIO DEL SERVIDOR ---
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`🚀 Servidor EMPREWEB en puerto ${PORT}`);
