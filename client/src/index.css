@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  scroll-behavior: smooth;
+}
+
+/* Evita saltos bruscos al cambiar de modo */
+* {
+  @apply transition-colors duration-300;
+}
+
+/* Efecto de difuminado para las tarjetas traslúcidas */
+.backdrop-blur-md {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+body {
+  @apply antialiased min-h-screen;
+}
