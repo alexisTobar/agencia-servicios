@@ -43,14 +43,15 @@ const Contacto = mongoose.model('Contacto', new mongoose.Schema({
   fecha: { type: Date, default: Date.now }
 }));
 
-// --- CONFIGURACIÓN DE CORREO MEJORADA (PUERTO 587 PARA RENDER) ---
+// --- CONFIGURACIÓN DE CORREO PROTEGIDA (USANDO VARIABLES DE ENTORNO) ---
+// Importante: Configura GMAIL_USER y GMAIL_PASS en el panel de Render
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 587,
-  secure: false, // false para puerto 587
+  secure: false, 
   auth: {
-    user: 'drokuas@gmail.com', 
-    pass: 'bjpz fups jvsi uajz' 
+    user: process.env.GMAIL_USER, // Ya no exponemos el correo aquí
+    pass: process.env.GMAIL_PASS  // Ya no exponemos la clave aquí
   },
   tls: {
     rejectUnauthorized: false
@@ -113,8 +114,8 @@ app.post('/api/contacto', async (req, res) => {
 
     // 2. Enviar Email
     const mailOptions = {
-      from: `"EMPREWEB NOTIFICADOR" <drokuas@gmail.com>`,
-      to: 'drokuas@gmail.com', 
+      from: `"EMPREWEB NOTIFICADOR" <${process.env.GMAIL_USER}>`,
+      to: process.env.GMAIL_USER, // Te lo envías a ti mismo
       subject: `🚀 Nueva consulta de ${nombre}`,
       html: `
         <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd;">
