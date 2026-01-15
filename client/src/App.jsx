@@ -10,7 +10,8 @@ import {
   Layers, Globe, Palette, Megaphone, Target, User, Laptop, Terminal
 } from 'lucide-react';
 
-const API_URL = "http://localhost:5000/api";
+/* const API_URL = "http://localhost:5000/api"; */
+const API_URL = "https://tu-proyecto-backend.onrender.com/api";
 
 // --- FONDO PARALLAX PROFESIONAL ---
 const Background = () => {
