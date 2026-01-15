@@ -2,25 +2,26 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer'); 
 require('dotenv').config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// --- CONEXIÓN A MONGODB ATLAS ---
+// Conexión a MongoDB con mensaje de confirmación
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ Conectado exitosamente a MongoDB Atlas"))
   .catch(err => {
       console.log("❌ Error de conexión a MongoDB:", err);
+      console.log("Tip: Revisa que tu IP esté autorizada en Network Access en el panel de MongoDB Atlas (usar 0.0.0.0/0 para Render).");
   });
 
-// --- MODELOS DE DATOS ---
+// Modelo para Servicios (Web, Landing, ADICIONAL, PRINCIPAL y PROYECTO)
 const ServicioSchema = new mongoose.Schema({
   titulo: String,
   precio: String,
-  desc: String,
+  desc: String, // Separado por comas
+  // ACTUALIZADO: Agregamos 'principal' y 'proyecto' para que el servidor los acepte
   categoria: { 
     type: String, 
     enum: ['web', 'landing', 'adicional', 'principal', 'proyecto'] 
@@ -29,6 +30,7 @@ const ServicioSchema = new mongoose.Schema({
 });
 const Servicio = mongoose.model('Servicio', ServicioSchema);
 
+// Modelo para Reseñas
 const ResenaSchema = new mongoose.Schema({
   nombre: String,
   comentario: String,
@@ -36,60 +38,30 @@ const ResenaSchema = new mongoose.Schema({
 });
 const Resena = mongoose.model('Resena', ResenaSchema);
 
+// Modelo Contacto
 const Contacto = mongoose.model('Contacto', new mongoose.Schema({
-  nombre: String, 
-  email: String, 
-  mensaje: String, 
-  fecha: { type: Date, default: Date.now }
+  nombre: String, email: String, mensaje: String, fecha: { type: Date, default: Date.now }
 }));
 
-// --- CONFIGURACIÓN DE CORREO PROTEGIDA (PUERTO 587 PARA NUBE) ---
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false, 
-  auth: {
-    user: process.env.GMAIL_USER, 
-    pass: process.env.GMAIL_PASS 
-  },
-  tls: {
-    rejectUnauthorized: false,
-    minVersion: "TLSv1.2"
-  },
-  pool: true, // Mantiene la conexión abierta para mayor velocidad
-  maxConnections: 1,
-  connectionTimeout: 10000 // 10 segundos de espera
-});
-
-// Verificar conexión del correo al iniciar
-transporter.verify((error, success) => {
-  if (error) {
-    console.log("❌ Error en configuración SMTP (Revisa GMAIL_USER y GMAIL_PASS en Render):", error.message);
-  } else {
-    console.log("📧 Servidor de correo conectado y listo para enviar");
-  }
-});
-
-// --- MIDDLEWARE DE AUTENTICACIÓN ---
+// Middleware Auth
 const auth = (req, res, next) => {
   try {
     const token = req.headers['authorization'];
-    if (!token) return res.status(401).send("No autorizado");
     jwt.verify(token, process.env.JWT_SECRET);
     next();
-  } catch (e) { res.status(401).send("Token inválido"); }
+  } catch (e) { res.status(401).send("No autorizado"); }
 };
 
-// --- RUTAS API ---
-
+// Rutas
 app.post('/api/login', (req, res) => {
   if (req.body.password === process.env.ADMIN_PASSWORD) {
     const token = jwt.sign({ admin: true }, process.env.JWT_SECRET);
     return res.json({ token });
   }
-  res.status(401).send("Error de acceso");
+  res.status(401).send("Error");
 });
 
+// CRUD Servicios (Protegidos menos el GET)
 app.get('/api/servicios', async (req, res) => res.json(await Servicio.find()));
 
 app.post('/api/servicios', auth, async (req, res) => {
@@ -98,70 +70,22 @@ app.post('/api/servicios', auth, async (req, res) => {
     await nuevoServicio.save();
     res.json(nuevoServicio);
   } catch (error) {
+    console.error("❌ Error al guardar servicio:", error);
     res.status(500).json({ error: error.message });
   }
 });
 
-app.put('/api/servicios/:id', auth, async (req, res) => {
-  try {
-    const actualizado = await Servicio.findByIdAndUpdate(req.params.id, req.body, {new: true});
-    res.json(actualizado);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+// Agregado {new: true} para que devuelva el dato actualizado al frontend
+app.put('/api/servicios/:id', auth, async (req, res) => res.json(await Servicio.findByIdAndUpdate(req.params.id, req.body, {new: true})));
+app.delete('/api/servicios/:id', auth, async (req, res) => res.json(await Servicio.findByIdAndDelete(req.params.id)));
 
-app.delete('/api/servicios/:id', auth, async (req, res) => {
-  try {
-    await Servicio.findByIdAndDelete(req.params.id);
-    res.json({ message: "Eliminado" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
+// CRUD Reseñas (POST público para que clientes opinen)
 app.get('/api/resenas', async (req, res) => res.json(await Resena.find()));
-app.post('/api/resenas', async (req, res) => res.json(await new Resena(req.body).save()));
+app.post('/api/resenas', async (req, res) => res.json(await new Resena(req.body).save())); // RUTA PÚBLICA
 app.delete('/api/resenas/:id', auth, async (req, res) => res.json(await Resena.findByIdAndDelete(req.params.id)));
 
-// --- RUTA DE CONTACTO SILENCIOSA ---
-app.post('/api/contacto', async (req, res) => {
-  try {
-    const { nombre, email, mensaje } = req.body;
+app.post('/api/contacto', async (req, res) => res.json(await new Contacto(req.body).save()));
 
-    // Guardar en Base de Datos para respaldo
-    const nuevaConsulta = new Contacto({ nombre, email, mensaje });
-    await nuevaConsulta.save();
-
-    // Enviar Email
-    const mailOptions = {
-      from: `"EMPREWEB NOTIFICADOR" <${process.env.GMAIL_USER}>`,
-      to: process.env.GMAIL_USER, 
-      subject: `🚀 Nueva consulta de proyecto: ${nombre}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
-          <h2 style="color: #4f46e5;">Nueva solicitud de contacto</h2>
-          <p><strong>Nombre:</strong> ${nombre}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Mensaje:</strong></p>
-          <div style="background: #f9f9f9; padding: 15px; border-radius: 5px;">${mensaje}</div>
-          <hr style="border: none; border-top: 1px solid #eee; margin-top: 20px;">
-          <p style="font-size: 0.8em; color: #777;">Enviado automáticamente desde EMPREWEB STUDIO</p>
-        </div>
-      `
-    };
-
-    await transporter.sendMail(mailOptions);
-    res.json({ success: true, message: "Consulta enviada exitosamente" });
-
-  } catch (error) {
-    console.error("❌ Error en proceso de contacto:", error);
-    res.status(500).json({ error: "No se pudo procesar el envío." });
-  }
-});
-
-// --- PUERTO ADAPTATIVO ---
+// MODIFICACIÓN CLAVE PARA RENDER: Usar el puerto de la variable de entorno
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`🚀 Servidor EMPREWEB activo en puerto ${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 Servidor EMPREWEB corriendo en Puerto ${PORT}`));
