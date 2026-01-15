@@ -377,11 +377,7 @@ export default function App() {
               <p className="text-slate-500 text-xs max-w-xs uppercase tracking-widest font-bold">Ingeniería Digital Profesional • Talagante, Chile • Proyectos de Clase Mundial</p>
             </div>
             
-            <div className="flex gap-8 text-slate-400">
-               <a href="https://wa.me/56977922875" className="hover:text-indigo-500 transition-colors"><MessageCircle size={24}/></a>
-               <a href="#" className="hover:text-indigo-500 transition-colors"><Instagram size={24}/></a>
-               <a href="#" className="hover:text-indigo-500 transition-colors"><Github size={24}/></a>
-            </div>
+            
 
             <div className="text-center md:text-right">
               <p className="text-[9px] font-black uppercase tracking-[0.5em] opacity-30 italic">© 2026 EMPREWEB STUDIO CHILE</p>
