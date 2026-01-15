@@ -10,7 +10,6 @@ app.use(cors());
 app.use(express.json());
 
 // --- CONEXIÓN A MONGODB ATLAS ---
-// La URI se maneja vía variable de entorno para seguridad total
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ Conectado exitosamente a MongoDB Atlas"))
   .catch(err => {
@@ -45,7 +44,6 @@ const Contacto = mongoose.model('Contacto', new mongoose.Schema({
 }));
 
 // --- CONFIGURACIÓN DE CORREO PROTEGIDA (PUERTO 587 PARA NUBE) ---
-// No hay correos ni claves escritas aquí, todo viene de Render
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 587,
@@ -57,13 +55,16 @@ const transporter = nodemailer.createTransport({
   tls: {
     rejectUnauthorized: false,
     minVersion: "TLSv1.2"
-  }
+  },
+  pool: true, // Mantiene la conexión abierta para mayor velocidad
+  maxConnections: 1,
+  connectionTimeout: 10000 // 10 segundos de espera
 });
 
-// Verificar conexión del correo al iniciar sin exponer datos
+// Verificar conexión del correo al iniciar
 transporter.verify((error, success) => {
   if (error) {
-    console.log("❌ Error en configuración SMTP. Revisa las variables en Render.");
+    console.log("❌ Error en configuración SMTP (Revisa GMAIL_USER y GMAIL_PASS en Render):", error.message);
   } else {
     console.log("📧 Servidor de correo conectado y listo para enviar");
   }
@@ -128,14 +129,14 @@ app.post('/api/contacto', async (req, res) => {
   try {
     const { nombre, email, mensaje } = req.body;
 
-    // Guardar en Base de Datos para que no se pierda nada
+    // Guardar en Base de Datos para respaldo
     const nuevaConsulta = new Contacto({ nombre, email, mensaje });
     await nuevaConsulta.save();
 
     // Enviar Email
     const mailOptions = {
       from: `"EMPREWEB NOTIFICADOR" <${process.env.GMAIL_USER}>`,
-      to: process.env.GMAIL_USER, // Se envía a tu propio correo
+      to: process.env.GMAIL_USER, 
       subject: `🚀 Nueva consulta de proyecto: ${nombre}`,
       html: `
         <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
