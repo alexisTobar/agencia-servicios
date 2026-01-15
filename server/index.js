@@ -48,7 +48,7 @@ const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: 'drokuas@gmail.com', // Reemplaza con tu Gmail
-    pass: 'bjpzfupsjvsiuajz'          // Reemplaza con tu Clave de Aplicación de Google
+    pass: 'bjpz fups jvsi uajz'          // Reemplaza con tu Clave de Aplicación de Google
   }
 });
 
@@ -103,7 +103,7 @@ app.post('/api/contacto', async (req, res) => {
     // 2. Configurar el Email
     const mailOptions = {
       from: `EMPREWEB <${req.body.email}>`,
-      to: 'contacto@empreweb.com', // Tu correo donde quieres recibir las consultas
+      to: 'drokuas@gmail.com', // Tu correo donde quieres recibir las consultas
       subject: `🚀 Nueva consulta de ${req.body.nombre}`,
       text: `Has recibido un mensaje:\n\nNombre: ${req.body.nombre}\nEmail: ${req.body.email}\nMensaje: ${req.body.mensaje}`
     };

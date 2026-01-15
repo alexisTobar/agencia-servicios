@@ -364,7 +364,7 @@ const PriceCard = ({ item, isAdmin, onUpdate, onDelete, color = "indigo" }) => {
             ))}
           </ul>
           {/* TARJETAS ABREN WHATSAPP */}
-          <button onClick={() => window.open(`https://wa.me/56977922875?text=Hola Alexis, cotización plan: ${item.titulo}`, '_blank')} className="w-full py-5 md:py-6 bg-slate-900 dark:bg-white text-white dark:text-black rounded-full font-black uppercase text-[10px] tracking-widest hover:bg-indigo-600 transition-all text-center shadow-xl text-left text-center text-center">Cotizar por WhatsApp</button>
+          <button onClick={() => window.open(`https://wa.me/56977922875?text=Hola EMPREWEB, cotización plan: ${item.titulo}`, '_blank')} className="w-full py-5 md:py-6 bg-slate-900 dark:bg-white text-white dark:text-black rounded-full font-black uppercase text-[10px] tracking-widest hover:bg-indigo-600 transition-all text-center shadow-xl text-left text-center text-center">Cotizar por WhatsApp</button>
         </>
       )}
     </motion.div>
