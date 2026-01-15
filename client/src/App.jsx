@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 
 /* const API_URL = "http://localhost:5000/api"; */
-const API_URL = "https://tu-proyecto-backend.onrender.com/api";
+const API_URL = "https://agencia-servicios.onrender.com/api";
 
 // --- FONDO PARALLAX PROFESIONAL ---
 const Background = () => {
