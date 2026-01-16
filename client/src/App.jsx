@@ -27,32 +27,35 @@ const Background = () => {
   );
 };
 
-// --- COMPONENTE ACORDEÓN FAQ ---
+// --- COMPONENTE ACORDEÓN FAQ (ANIMACIÓN MEJORADA) ---
 const FAQItem = ({ question, answer }) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <div className="border-b border-zinc-200 dark:border-white/10 mb-2 page-break-inside-avoid">
+    <div className="mb-4 overflow-hidden rounded-2xl border border-zinc-200 dark:border-white/5 bg-white/50 dark:bg-white/5 backdrop-blur-sm transition-all hover:border-indigo-500/50">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full py-5 flex justify-between items-center text-left hover:text-indigo-500 transition-colors"
+        className="flex w-full items-center justify-between p-6 text-left"
       >
-        <span className="font-black uppercase text-[11px] tracking-widest">{question}</span>
-        <motion.div animate={{ rotate: isOpen ? 180 : 0 }} className="no-print">
-          <ChevronDown size={18} />
+        <span className="font-black uppercase text-[11px] tracking-widest text-slate-800 dark:text-white">{question}</span>
+        <motion.div 
+          animate={{ rotate: isOpen ? 180 : 0, scale: isOpen ? 1.2 : 1 }}
+          transition={{ type: "spring", stiffness: 300 }}
+          className="text-indigo-500"
+        >
+          <ChevronDown size={20} />
         </motion.div>
       </button>
       <AnimatePresence>
-        {(isOpen || (typeof window !== 'undefined' && window.matchMedia('print').matches)) && (
+        {isOpen && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="overflow-hidden"
+            initial={{ height: 0, opacity: 0, x: -20 }}
+            animate={{ height: "auto", opacity: 1, x: 0 }}
+            exit={{ height: 0, opacity: 0, x: 20 }}
+            transition={{ type: "spring", duration: 0.5, bounce: 0.3 }}
           >
-            <p className="pb-6 text-sm text-slate-500 dark:text-slate-400 leading-relaxed italic">
+            <div className="px-6 pb-6 text-sm text-slate-500 dark:text-slate-400 leading-relaxed italic border-t border-zinc-100 dark:border-white/5 pt-4">
               {answer}
-            </p>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -60,14 +63,10 @@ const FAQItem = ({ question, answer }) => {
   );
 };
 
-// --- COMPONENTE DE SERVICIO INDIVIDUAL (OPTIMIZADO PARA EDICIÓN FLUIDA) ---
+// --- COMPONENTE DE SERVICIO INDIVIDUAL ---
 const ServicioCard = ({ item, isAdmin, onUpdate, onDelete }) => {
   const [localItem, setLocalItem] = useState(item);
-
-  // Sincronizar si los items externos cambian
-  useEffect(() => {
-    setLocalItem(item);
-  }, [item]);
+  useEffect(() => { setLocalItem(item); }, [item]);
 
   return (
     <div className="relative group flex flex-col items-center">
@@ -80,27 +79,14 @@ const ServicioCard = ({ item, isAdmin, onUpdate, onDelete }) => {
       </div>
       {isAdmin ? (
         <div className="space-y-2 w-full">
-          <input
-            className="w-full bg-black/10 dark:bg-white/5 p-2 rounded-xl text-center font-bold"
-            value={localItem.titulo}
-            onChange={e => setLocalItem({ ...localItem, titulo: e.target.value })}
-          />
-          <textarea
-            className="w-full bg-black/10 dark:bg-white/5 p-2 rounded-xl text-center text-xs h-20"
-            value={localItem.desc}
-            onChange={e => setLocalItem({ ...localItem, desc: e.target.value })}
-          />
-          <button
-            onClick={() => onUpdate(item._id, localItem)}
-            className="bg-green-600 text-white px-4 py-1 rounded text-[10px] font-bold uppercase w-full"
-          >
-            GUARDAR CAMBIOS
-          </button>
+          <input className="w-full bg-black/10 dark:bg-white/5 p-2 rounded-xl text-center font-bold" value={localItem.titulo} onChange={e => setLocalItem({ ...localItem, titulo: e.target.value })} />
+          <textarea className="w-full bg-black/10 dark:bg-white/5 p-2 rounded-xl text-center text-xs h-20" value={localItem.desc} onChange={e => setLocalItem({ ...localItem, desc: e.target.value })} />
+          <button onClick={() => onUpdate(item._id, localItem)} className="bg-green-600 text-white px-4 py-1 rounded text-[10px] font-bold uppercase w-full">GUARDAR CAMBIOS</button>
         </div>
       ) : (
         <>
           <h4 className="text-xl font-black uppercase italic mb-4">{item.titulo}</h4>
-          <p className="text-slate-500 dark:text-slate-400 text-sm px-4 leading-relaxed">{item.desc}</p>
+          <p className="text-slate-500 dark:text-slate-400 text-sm px-4 leading-relaxed font-bold">{item.desc}</p>
         </>
       )}
     </div>
@@ -123,9 +109,7 @@ export default function App() {
   const [indexPalabra, setIndexPalabra] = useState(0);
 
   useEffect(() => {
-    const intervalo = setInterval(() => {
-      setIndexPalabra((prev) => (prev + 1) % palabras.length);
-    }, 2500);
+    const intervalo = setInterval(() => { setIndexPalabra((prev) => (prev + 1) % palabras.length); }, 2500);
     return () => clearInterval(intervalo);
   }, []);
 
@@ -139,12 +123,8 @@ export default function App() {
 
   const cargarTodo = async () => {
     try {
-      const [s, r] = await Promise.all([
-        axios.get(`${API_URL}/servicios`),
-        axios.get(`${API_URL}/resenas`)
-      ]);
-      setItems(s.data);
-      setResenas(r.data);
+      const [s, r] = await Promise.all([ axios.get(`${API_URL}/servicios`), axios.get(`${API_URL}/resenas`) ]);
+      setItems(s.data); setResenas(r.data);
     } catch (e) { toast.error("Error al cargar datos"); }
   };
 
@@ -176,8 +156,7 @@ export default function App() {
       await axios.post(`${API_URL}/resenas`, nuevaResena);
       toast.success("¡Reseña publicada!");
       setNuevaResena({ nombre: '', comentario: '', estrellas: 5 });
-      setShowResenaForm(false);
-      cargarTodo();
+      setShowResenaForm(false); cargarTodo();
     } catch (e) { toast.error("Error al publicar reseña"); }
   };
 
@@ -212,7 +191,7 @@ export default function App() {
 
   const faqs = [
     { q: "¿Modalidad de pago?", a: "Se paga el 50% al iniciar y el 50% restante al finalizar. Los productos adicionales se suben una vez finalizado y entregada la web." },
-    { q: "¿Cuánto tiempo se demora?", a: "El tiempo de entrega máximo es de 30 días hábiles. Generalmente se entrega en 7 a 14 días hábiles dependiendo de la carga de proyectos, pero nunca excederá los 30 días." },
+    { q: "¿Cuánto tiempo se demora?", a: "El tiempo de entrega máximo es de 30 días hábiles. Generalmente se entrega en 7 a 14 días hábiles dependiendo de la carga de proyectos." },
     { q: "¿Costo por productos adicionales?", a: "La subida inicial de productos es gratuita. Si deseas agregar más, el costo es de 5 USD en el plan E-commerce y 3 USD en el plan Premium." },
     { q: "¿Beneficios al subir nosotros los productos?", a: "Cada producto se optimiza al máximo para destacar. Incluye mejora de atributos y descripciones manuales optimizadas para SEO." },
     { q: "¿Qué cubre la garantía?", a: "La garantía cubre la actualización de información en la web después de la entrega, sin ningún problema ni costo adicional." },
@@ -221,8 +200,7 @@ export default function App() {
 
   return (
     <div className={`${darkMode ? 'dark' : ''} text-left`}>
-      <style dangerouslySetInnerHTML={{
-        __html: `
+      <style dangerouslySetInnerHTML={{ __html: `
             @media print {
                 nav, .no-print, button, .marquee-container, footer, .bg-rose-500, .bg-indigo-500\/20 { display: none !important; }
                 body, .min-h-screen { background: white !important; color: black !important; }
@@ -236,9 +214,9 @@ export default function App() {
         <Background />
 
         <nav className="fixed top-0 w-full z-[80] bg-white/10 dark:bg-black/20 backdrop-blur-xl border-b border-white/10 p-4 no-print">
-          <div className="max-w-7xl mx-auto flex justify-between items-center text-left">
-            <h1 className="text-xl md:text-2xl font-black italic uppercase flex items-center gap-2">
-              <Rocket className="text-indigo-500" /> EMPREWEB
+          <div className="max-w-7xl mx-auto flex justify-between items-center text-left text-left">
+            <h1 className="text-xl md:text-2xl font-black italic uppercase">
+              <Rocket className="inline mr-2 text-indigo-500" /> EMPREWEB
             </h1>
             <div className="hidden md:flex gap-8 text-[10px] font-black uppercase tracking-widest text-left">
               <a href="#inicio">Inicio</a>
@@ -252,7 +230,7 @@ export default function App() {
               </button>
               {isLogged && (
                 <div className="flex gap-2 bg-black/20 p-1 rounded-full border border-white/10">
-                  <button onClick={() => window.print()} className="p-2 text-green-500" title="Generar PDF"><FileText size={18} /></button>
+                  <button onClick={() => window.print()} className="p-2 text-green-500" title="Generar PDF Propuesta"><FileText size={18} /></button>
                   <button onClick={() => setIsAdminMode(!isAdminMode)} className={`p-2 rounded-full ${isAdminMode ? 'bg-indigo-500 text-white' : 'text-slate-400'}`}><Settings size={18} /></button>
                   <button onClick={handleLogout} className="p-2 text-rose-500"><LogOut size={18} /></button>
                 </div>
@@ -269,7 +247,7 @@ export default function App() {
               Tu <br />
               <div className="inline-block relative">
                 <AnimatePresence mode="wait">
-                  <motion.span key={palabras[indexPalabra]} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4 }} className="block text-7xl md:text-9xl text-indigo-500 font-black italic leading-none py-4 no-print">
+                  <motion.span key={palabras[indexPalabra]} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4 }} className="block text-7xl md:text-9xl text-indigo-500 font-black italic leading-none py-4 no-print text-left">
                     {palabras[indexPalabra]}
                   </motion.span>
                 </AnimatePresence>
@@ -278,12 +256,7 @@ export default function App() {
               <br />
               <span className="text-5xl md:text-7xl">al Siguiente Nivel.</span>
             </h2>
-            <p className="text-slate-500 dark:text-slate-400 max-w-xl text-lg mb-10 leading-relaxed font-bold italic">
-              Donde la tecnología y el diseño profesional se unen para disparar tus ventas.
-            </p>
-            <div className="flex gap-4 no-print">
-              <a href="#contacto" className="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black uppercase text-xs shadow-xl hover:bg-indigo-700 transition-all">Comenzar ahora</a>
-            </div>
+            <p className="text-slate-500 dark:text-slate-400 max-w-xl text-lg mb-10 leading-relaxed font-bold italic">Donde la tecnología y el diseño profesional se unen para disparar tus ventas.</p>
           </motion.div>
           <motion.div animate={{ y: [0, -30, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} className="flex justify-center no-print">
             <img src="https://i.postimg.cc/DwGDHxxH/Copilot-20260115-120913.png" alt="Hero" className="w-full h-auto object-contain lg:scale-150 drop-shadow-2xl" />
@@ -292,47 +265,36 @@ export default function App() {
 
         <div className="marquee-container no-print">
           <Marquee className="bg-indigo-600 dark:bg-indigo-900 py-6 text-white font-black uppercase italic border-y border-white/10" speed={50}>
-            ALTA VELOCIDAD • DISEÑO PROFESIONAL • OPTIMIZACIÓN SEO • EMPREWEB STUDIO • PAGINAS WEB • LANDING PAGE • MANTENIMIENTO
+             ALTA VELOCIDAD • DISEÑO PROFESIONAL • OPTIMIZACIÓN SEO • EMPREWEB STUDIO • TALAGANTE CHILE •
           </Marquee>
         </div>
 
-        {/* --- SECCIÓN SERVICIOS PRINCIPALES (CON COMPONENTE OPTIMIZADO) --- */}
         <section id="servicios-principales" className="py-24 px-6 max-w-7xl mx-auto text-left">
           <div className="text-center mb-20">
             <h3 className="text-3xl md:text-5xl font-black tracking-tighter uppercase italic">Mis Servicios <span className="text-rose-500 underline decoration-indigo-500 underline-offset-8">Principales</span></h3>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 text-center text-left">
             {items.filter(i => i.categoria === 'principal').map((item) => (
-              <ServicioCard
-                key={item._id}
-                item={item}
-                isAdmin={isAdminMode}
-                onUpdate={updateItem}
-                onDelete={(id) => deleteItem(id, 'servicios')}
-              />
+              <ServicioCard key={item._id} item={item} isAdmin={isAdminMode} onUpdate={updateItem} onDelete={(id) => deleteItem(id, 'servicios')} />
             ))}
             {isAdminMode && (
-              <button onClick={() => addItem('principal')} className="border-4 border-dashed rounded-[3rem] p-12 text-slate-300 no-print flex items-center justify-center hover:text-indigo-500 transition-all">
-                <Plus size={48} />
-              </button>
+              <button onClick={() => addItem('principal')} className="border-4 border-dashed rounded-[3rem] p-12 text-slate-300 no-print flex items-center justify-center hover:text-indigo-500 transition-all"><Plus size={48} /></button>
             )}
           </div>
         </section>
 
-        {/* PLANES WEB */}
         <section id="web" className="py-20 md:py-32 px-4 md:px-6 max-w-7xl mx-auto text-left">
           <div className="flex justify-between items-end mb-12 border-b border-indigo-500/20 pb-4">
-            <h3 className="text-3xl md:text-5xl font-black tracking-tighter uppercase italic">Webs <span className="text-indigo-500 text-left">Corporativas</span></h3>
-            {isAdminMode && <button onClick={() => addItem('web')} className="bg-indigo-500 p-2 rounded-full text-white shadow-xl no-print"><Plus size={20} /></button>}
+            <h3 className="text-3xl md:text-5xl font-black tracking-tighter uppercase italic">Webs <span className="text-indigo-500">Corporativas</span></h3>
+            {isAdminMode && <button onClick={() => addItem('web')} className="bg-indigo-500 p-3 rounded-full text-white shadow-xl no-print"><Plus size={20} /></button>}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {items.filter(i => i.categoria === 'web').map((item) => (
               <PriceCard key={item._id} item={item} isAdmin={isAdminMode} onUpdate={updateItem} onDelete={() => deleteItem(item._id, 'servicios')} />
             ))}
           </div>
         </section>
 
-        {/* PLANES LANDING */}
         <section id="landing" className="py-20 md:py-32 px-4 md:px-6 max-w-7xl mx-auto bg-slate-900/5 dark:bg-white/5 rounded-[3rem] md:rounded-[5rem] mb-20">
           <div className="flex justify-between items-end mb-12 border-b border-rose-500/20 pb-4 px-4 text-left">
             <h3 className="text-3xl md:text-5xl font-black tracking-tighter uppercase italic text-rose-500 text-left">Landing Pages</h3>
@@ -345,7 +307,6 @@ export default function App() {
           </div>
         </section>
 
-        {/* CASOS DE ÉXITO */}
         <section id="resenas" className="py-24 px-6 max-w-7xl mx-auto text-left overflow-hidden no-print">
           <div className="flex flex-col md:flex-row justify-between items-center mb-16 gap-6 text-left">
             <h3 className="text-3xl md:text-5xl font-black uppercase italic text-left text-left">Casos de <span className="text-indigo-500">Éxito</span></h3>
@@ -353,7 +314,7 @@ export default function App() {
           </div>
           <Marquee speed={35} pauseOnHover gradient={false}>
             {resenas.map((r) => (
-              <div key={r._id} className="mx-4 p-8 bg-white dark:bg-white/5 border border-white/10 rounded-[3rem] w-[320px] md:w-[450px] relative shadow-2xl text-left">
+              <div key={r._id} className="mx-4 p-8 bg-white dark:bg-white/5 border border-white/10 rounded-[3rem] w-[320px] md:w-[450px] relative shadow-2xl text-left text-left">
                 {isAdminMode && <button onClick={() => deleteItem(r._id, 'resenas')} className="absolute top-6 right-6 text-rose-500 hover:scale-125 transition-all text-left"><Trash2 size={20} /></button>}
                 <div className="flex gap-1 mb-4 text-yellow-500 text-left">
                   {[...Array(5)].map((_, i) => (<Star key={i} size={18} fill={i < r.estrellas ? "currentColor" : "none"} className={i < r.estrellas ? "" : "text-slate-300 dark:text-slate-700"} />))}
@@ -368,9 +329,10 @@ export default function App() {
           </Marquee>
         </section>
 
-        {/* CONTACTO Y FAQ */}
+        {/* --- CONTACTO Y FAQ (REDISEÑADO) --- */}
         <section id="contacto" className="py-20 md:py-40 px-6 max-w-7xl mx-auto z-10 relative">
           <div className="grid lg:grid-cols-2 gap-16 items-start">
+            
             <div className="text-left">
               <h2 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter mb-12 text-indigo-500 text-left">Preguntas <br /> Frecuentes</h2>
               <div className="space-y-2">
@@ -379,53 +341,74 @@ export default function App() {
                 ))}
               </div>
             </div>
+
             <div className="no-print">
-              <h2 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter mb-12 text-indigo-500 lg:text-right">Hablemos</h2>
-              <form onSubmit={enviarConsultaBackend} className="grid gap-6 bg-white dark:bg-zinc-900/50 p-8 md:p-12 rounded-[3rem] border border-zinc-200 dark:border-white/10 shadow-2xl">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-                  <input value={form.nombre} onChange={e => setForm({ ...form, nombre: e.target.value })} required className="w-full bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-white/10 p-6 rounded-3xl outline-none focus:border-indigo-500 font-bold" placeholder="NOMBRE COMPLETO" />
-                  <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required className="w-full bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-white/10 p-6 rounded-3xl outline-none focus:border-indigo-500 font-bold" placeholder="TU EMAIL" />
-                </div>
-                <textarea value={form.mensaje} onChange={e => setForm({ ...form, mensaje: e.target.value })} required className="w-full bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-white/10 p-6 rounded-3xl h-40 outline-none focus:border-indigo-500 font-bold resize-none" placeholder="DETALLES DEL PROYECTO" />
-                <button disabled={enviando} className="w-full bg-indigo-600 text-white py-6 rounded-3xl font-black uppercase text-[12px] tracking-[0.2em] italic hover:bg-indigo-700 transition-all flex items-center justify-center gap-3 shadow-xl">
-                  {enviando ? "Procesando..." : <><Send size={18} /> Solicitar Propuesta de Proyecto</>}
-                </button>
-              </form>
+              <div className="relative p-1 rounded-[3rem] bg-gradient-to-br from-indigo-500/20 via-transparent to-rose-500/20">
+                <form onSubmit={enviarConsultaBackend} className="relative overflow-hidden bg-white/80 dark:bg-black/60 backdrop-blur-3xl p-10 md:p-14 rounded-[2.8rem] border border-white/20 shadow-2xl">
+                  <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter mb-10 text-indigo-500">Hablemos</h2>
+                  <div className="grid gap-6">
+                    <div className="group relative">
+                      <input 
+                        value={form.nombre} onChange={e => setForm({ ...form, nombre: e.target.value })} required 
+                        className="w-full bg-slate-100/50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 p-5 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold placeholder:opacity-50" 
+                        placeholder="TU NOMBRE" 
+                      />
+                    </div>
+                    <div className="group relative">
+                      <input 
+                        type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required 
+                        className="w-full bg-slate-100/50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 p-5 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold placeholder:opacity-50" 
+                        placeholder="CORREO ELECTRÓNICO" 
+                      />
+                    </div>
+                    <div className="group relative">
+                      <textarea 
+                        value={form.mensaje} onChange={e => setForm({ ...form, mensaje: e.target.value })} required 
+                        className="w-full bg-slate-100/50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 p-5 rounded-2xl h-40 outline-none focus:border-indigo-500 transition-all font-bold resize-none placeholder:opacity-50" 
+                        placeholder="DETALLES DE TU PROYECTO" 
+                      />
+                    </div>
+                    <motion.button 
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      disabled={enviando} 
+                      className="relative overflow-hidden w-full group bg-indigo-600 p-6 rounded-2xl font-black uppercase text-[12px] tracking-[0.2em] italic text-white shadow-xl flex items-center justify-center gap-3"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-indigo-400 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <span className="relative z-10 flex items-center gap-3">
+                        {enviando ? "PROCESANDO..." : <><Send size={18} /> ENVIAR PROPUESTA</>}
+                      </span>
+                    </motion.button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* FOOTER - LIMPICAR Y PROFESIONAL */}
         <footer className="bg-black/20 backdrop-blur-3xl border-t border-white/10 py-20 px-6 no-print">
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12 text-left">
-
-            {/* LOGO Y ESlogan */}
             <div className="text-center md:text-left">
               <h2 className="text-2xl font-black italic uppercase flex items-center gap-2 mb-4 justify-center md:justify-start">
                 <Rocket className="text-indigo-500" />
                 <span>EMPREWEB</span>
               </h2>
-              <p className="text-slate-500 text-xs max-w-xs uppercase tracking-widest font-bold">
-                Ingeniería Digital Profesional • Talagante, Chile
-              </p>
+              <p className="text-slate-500 text-xs max-w-xs uppercase tracking-widest font-bold text-left">Ingeniería Digital Profesional • Talagante, Chile</p>
             </div>
-
-            {/* SECCIÓN DERECHA - COPYRIGHT Y TAGLINE */}
-            <div className="text-center md:text-right">
-              <p className="text-[9px] font-black uppercase tracking-[0.5em] opacity-30 italic">
-                © 2026 EMPREWEB STUDIO CHILE
-              </p>
-              <p className="text-[7px] font-bold text-indigo-500/50 uppercase tracking-[0.2em] mt-2">
-                Tecnología de Vanguardia
-              </p>
+            <div className="flex gap-8 text-slate-400">
+               <a href="https://wa.me/56977922875" className="hover:text-indigo-500 transition-colors"><MessageCircle size={24}/></a>
+               <a href="#" className="hover:text-indigo-500 transition-colors"><Instagram size={24}/></a>
+               <a href="#" className="hover:text-indigo-500 transition-colors"><Github size={24}/></a>
             </div>
-
+            <div className="text-center md:text-right text-left">
+              <p className="text-[9px] font-black uppercase tracking-[0.5em] opacity-30 italic">© 2026 EMPREWEB STUDIO CHILE</p>
+              <p className="text-[7px] font-bold text-indigo-500/50 uppercase tracking-[0.2em] mt-2 text-left">Tecnología de Vanguardia</p>
+            </div>
           </div>
         </footer>
 
         {!isLogged && <div onClick={() => setShowLogin(true)} className="fixed bottom-0 left-0 w-24 h-24 cursor-default z-[100] opacity-0 text-left no-print" title="Admin Login" />}
 
-        {/* MODALES */}
         <AnimatePresence>
           {showResenaForm && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[110] bg-black/95 backdrop-blur-md flex items-center justify-center p-4 text-left">
@@ -435,7 +418,7 @@ export default function App() {
                 <form onSubmit={submitResena} className="space-y-4 text-left">
                   <input className="bg-slate-100 dark:bg-white/5 w-full p-5 rounded-xl text-center font-black text-slate-900 dark:text-white outline-none text-left" placeholder="TU NOMBRE" required value={nuevaResena.nombre} onChange={e => setNuevaResena({ ...nuevaResena, nombre: e.target.value })} />
                   <textarea className="bg-slate-100 dark:bg-white/5 w-full p-5 rounded-xl text-center font-black text-slate-900 dark:text-white h-32 outline-none text-left" placeholder="COMENTARIO" required value={nuevaResena.comentario} onChange={e => setNuevaResena({ ...nuevaResena, comentario: e.target.value })} />
-                  <div className="flex flex-col items-center py-2 text-yellow-500 text-left text-left">
+                  <div className="flex flex-col items-center py-2 text-yellow-500 text-left">
                     <div className="flex gap-2 text-left">
                       {[1, 2, 3, 4, 5].map(s => (
                         <button key={s} type="button" onClick={() => setNuevaResena({ ...nuevaResena, estrellas: s })}>
@@ -452,12 +435,12 @@ export default function App() {
 
           {showLogin && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[120] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 text-left">
-              <div className="bg-white dark:bg-[#0a0a0a] p-10 rounded-[3rem] w-full max-w-sm text-center border border-white/10 shadow-2xl text-left">
+              <div className="bg-white dark:bg-[#0a0a0a] p-10 rounded-[3rem] w-full max-w-sm text-center border border-white/10 shadow-2xl text-left text-left text-left">
                 <Terminal size={40} className="mx-auto mb-6 text-indigo-500 text-left" />
                 <h4 className="text-xl md:text-2xl font-black mb-6 italic uppercase text-indigo-500 text-center text-left">Acceso Maestro</h4>
-                <input type="password" autoFocus className="bg-slate-100 dark:bg-white/5 w-full p-5 rounded-xl md:rounded-2xl mb-4 text-center font-black text-xl md:text-2xl text-slate-900 dark:text-white outline-none border-2 border-indigo-500/20 text-left" value={password} onChange={(e) => setPassword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleLogin()} />
-                <button onClick={handleLogin} className="w-full bg-indigo-600 py-3 md:py-4 rounded-xl md:rounded-2xl font-black text-white uppercase tracking-widest text-xs transition-all hover:bg-indigo-700 text-left text-center">Desbloquear</button>
-                <button onClick={() => setShowLogin(false)} className="mt-4 text-xs font-bold text-slate-400 uppercase text-left text-left text-left">Cerrar</button>
+                <input type="password" autoFocus className="bg-slate-100 dark:bg-white/5 w-full p-5 rounded-xl md:rounded-2xl mb-4 text-center font-black text-xl md:text-2xl text-slate-900 dark:text-white outline-none border-2 border-indigo-500/20 text-left text-left" value={password} onChange={(e) => setPassword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleLogin()} />
+                <button onClick={handleLogin} className="w-full bg-indigo-600 py-3 md:py-4 rounded-xl md:rounded-2xl font-black text-white uppercase tracking-widest text-xs transition-all hover:bg-indigo-700 text-left text-center text-left">Desbloquear</button>
+                <button onClick={() => setShowLogin(false)} className="mt-4 text-xs font-bold text-slate-400 uppercase text-left text-left">Cerrar</button>
               </div>
             </motion.div>
           )}
@@ -467,26 +450,24 @@ export default function App() {
   );
 }
 
-// --- COMPONENTE DE TARJETA DE PRECIO (TAMBIÉN OPTIMIZADO PARA EDICIÓN FLUIDA) ---
+// --- COMPONENTE DE TARJETA DE PRECIO (OPTIMIZADO) ---
 const PriceCard = ({ item, isAdmin, onUpdate, onDelete, color = "indigo" }) => {
   const [localEdit, setLocalEdit] = useState(item);
   const themeColors = { rose: "border-rose-500 text-rose-500", indigo: "border-indigo-500 text-indigo-500", orange: "border-orange-500 text-orange-500" };
   const currentTheme = themeColors[color] || themeColors.indigo;
 
-  useEffect(() => {
-    setLocalEdit(item);
-  }, [item]);
+  useEffect(() => { setLocalEdit(item); }, [item]);
 
   return (
-    <motion.div whileHover={{ y: -8 }} className={`price-card bg-white/40 dark:bg-white/5 backdrop-blur-lg border border-slate-200 dark:border-white/10 p-8 md:p-12 rounded-[3.5rem] md:rounded-[4.5rem] flex flex-col h-full border-b-[12px] md:border-b-[16px] ${currentTheme} transition-all shadow-2xl text-left text-left text-left`}>
+    <motion.div whileHover={{ y: -8 }} className={`price-card bg-white/40 dark:bg-white/5 backdrop-blur-lg border border-slate-200 dark:border-white/10 p-8 md:p-12 rounded-[3.5rem] md:rounded-[4.5rem] flex flex-col h-full border-b-[12px] md:border-b-[16px] ${currentTheme} transition-all shadow-2xl text-left text-left text-left text-left`}>
       {isAdmin ? (
         <div className="space-y-4 text-left">
           <input className="w-full bg-black/20 p-3 rounded-2xl text-xs text-white outline-none border border-white/5 focus:border-indigo-500 text-left text-left" value={localEdit.titulo} onChange={e => setLocalEdit({ ...localEdit, titulo: e.target.value })} />
           <input className="w-full bg-black/20 p-3 rounded-2xl text-xs font-black text-indigo-500 outline-none border border-white/5 focus:border-indigo-500 text-left text-left" value={localEdit.precio} onChange={e => setLocalEdit({ ...localEdit, precio: e.target.value })} />
-          <textarea className="w-full bg-black/20 p-3 rounded-2xl text-xs h-24 text-white outline-none border border-white/5 focus:border-indigo-500 text-left text-left" value={localEdit.desc} onChange={e => setLocalEdit({ ...localEdit, desc: e.target.value })} />
+          <textarea className="w-full bg-black/20 p-3 rounded-2xl text-xs h-24 text-white outline-none border border-white/5 focus:border-indigo-500 text-left text-left text-left" value={localEdit.desc} onChange={e => setLocalEdit({ ...localEdit, desc: e.target.value })} />
           <div className="flex gap-2 text-left">
-            <button onClick={() => onUpdate(item._id, localEdit)} className="flex-1 bg-green-600 text-white py-3 rounded-2xl text-[10px] font-bold uppercase transition-all hover:bg-green-700 text-left text-center">GUARDAR CAMBIOS</button>
-            <button onClick={() => onDelete(item._id)} className="bg-rose-600 text-white px-4 rounded-2xl transition-all hover:bg-rose-700 text-left text-left text-left"><Trash2 size={16} /></button>
+            <button onClick={() => onUpdate(item._id, localEdit)} className="flex-1 bg-green-600 text-white py-3 rounded-2xl text-[10px] font-bold uppercase transition-all hover:bg-green-700 text-left text-center">GUARDAR</button>
+            <button onClick={() => onDelete(item._id)} className="bg-rose-600 text-white px-4 rounded-2xl transition-all hover:bg-rose-700 text-left text-left text-left text-left"><Trash2 size={16} /></button>
           </div>
         </div>
       ) : (
@@ -495,8 +476,8 @@ const PriceCard = ({ item, isAdmin, onUpdate, onDelete, color = "indigo" }) => {
           <div className={`text-2xl md:text-3xl font-black mb-10 italic text-left text-left`}>{item.precio}</div>
           <ul className="space-y-4 md:space-y-5 mb-10 md:mb-14 flex-grow text-left text-left text-left">
             {item.desc.split(',').map((p, i) => (
-              <li key={i} className="flex gap-4 text-xs md:text-sm font-bold text-slate-500 dark:text-slate-400 text-left text-left text-left">
-                <CheckCircle2 size={18} className="text-indigo-500 shrink-0 text-left text-left text-left" /> {p.trim()}
+              <li key={i} className="flex gap-4 text-xs md:text-sm font-bold text-slate-500 dark:text-slate-400 text-left text-left text-left text-left">
+                <CheckCircle2 size={18} className="text-indigo-500 shrink-0 text-left text-left text-left text-left" /> {p.trim()}
               </li>
             ))}
           </ul>
