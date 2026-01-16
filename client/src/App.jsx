@@ -32,7 +32,7 @@ const FAQItem = ({ question, answer }) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <div className="border-b border-zinc-200 dark:border-white/10 mb-2 page-break-inside-avoid">
-      <button 
+      <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full py-5 flex justify-between items-center text-left hover:text-indigo-500 transition-colors"
       >
@@ -71,27 +71,27 @@ const ServicioCard = ({ item, isAdmin, onUpdate, onDelete }) => {
 
   return (
     <div className="relative group flex flex-col items-center">
-      {isAdmin && <button onClick={() => onDelete(item._id)} className="absolute -top-4 text-rose-500 hover:scale-110 transition-all text-left"><Trash2 size={16}/></button>}
+      {isAdmin && <button onClick={() => onDelete(item._id)} className="absolute -top-4 text-rose-500 hover:scale-110 transition-all text-left"><Trash2 size={16} /></button>}
       <div className="w-24 h-24 bg-rose-500/10 text-rose-500 rounded-[2.5rem] flex items-center justify-center mb-8 border border-rose-500/10 shadow-2xl group-hover:bg-rose-500 group-hover:text-white transition-all">
         {item.titulo.toLowerCase().includes('web') ? <Globe size={40} /> :
-         item.titulo.toLowerCase().includes('marketing') ? <Target size={40} /> :
-         item.titulo.toLowerCase().includes('grafico') ? <Palette size={40} /> :
-         item.titulo.toLowerCase().includes('publicidad') ? <Megaphone size={40} /> : <Zap size={40} />}
+          item.titulo.toLowerCase().includes('marketing') ? <Target size={40} /> :
+            item.titulo.toLowerCase().includes('grafico') ? <Palette size={40} /> :
+              item.titulo.toLowerCase().includes('publicidad') ? <Megaphone size={40} /> : <Zap size={40} />}
       </div>
       {isAdmin ? (
         <div className="space-y-2 w-full">
-          <input 
-            className="w-full bg-black/10 dark:bg-white/5 p-2 rounded-xl text-center font-bold" 
-            value={localItem.titulo} 
-            onChange={e => setLocalItem({...localItem, titulo: e.target.value})} 
+          <input
+            className="w-full bg-black/10 dark:bg-white/5 p-2 rounded-xl text-center font-bold"
+            value={localItem.titulo}
+            onChange={e => setLocalItem({ ...localItem, titulo: e.target.value })}
           />
-          <textarea 
-            className="w-full bg-black/10 dark:bg-white/5 p-2 rounded-xl text-center text-xs h-20" 
-            value={localItem.desc} 
-            onChange={e => setLocalItem({...localItem, desc: e.target.value})} 
+          <textarea
+            className="w-full bg-black/10 dark:bg-white/5 p-2 rounded-xl text-center text-xs h-20"
+            value={localItem.desc}
+            onChange={e => setLocalItem({ ...localItem, desc: e.target.value })}
           />
-          <button 
-            onClick={() => onUpdate(item._id, localItem)} 
+          <button
+            onClick={() => onUpdate(item._id, localItem)}
             className="bg-green-600 text-white px-4 py-1 rounded text-[10px] font-bold uppercase w-full"
           >
             GUARDAR CAMBIOS
@@ -221,7 +221,8 @@ export default function App() {
 
   return (
     <div className={`${darkMode ? 'dark' : ''} text-left`}>
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
             @media print {
                 nav, .no-print, button, .marquee-container, footer, .bg-rose-500, .bg-indigo-500\/20 { display: none !important; }
                 body, .min-h-screen { background: white !important; color: black !important; }
@@ -274,7 +275,7 @@ export default function App() {
                 </AnimatePresence>
                 <span className="hidden print:block text-7xl md:text-9xl text-black font-black italic leading-none py-4">PROYECTO</span>
               </div>
-              <br /> 
+              <br />
               <span className="text-5xl md:text-7xl">al Siguiente Nivel.</span>
             </h2>
             <p className="text-slate-500 dark:text-slate-400 max-w-xl text-lg mb-10 leading-relaxed font-bold italic">
@@ -291,7 +292,7 @@ export default function App() {
 
         <div className="marquee-container no-print">
           <Marquee className="bg-indigo-600 dark:bg-indigo-900 py-6 text-white font-black uppercase italic border-y border-white/10" speed={50}>
-             ALTA VELOCIDAD • DISEÑO PROFESIONAL • OPTIMIZACIÓN SEO • EMPREWEB STUDIO • PAGINAS WEB • LANDING PAGE • MANTENIMIENTO
+            ALTA VELOCIDAD • DISEÑO PROFESIONAL • OPTIMIZACIÓN SEO • EMPREWEB STUDIO • PAGINAS WEB • LANDING PAGE • MANTENIMIENTO
           </Marquee>
         </div>
 
@@ -302,17 +303,17 @@ export default function App() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 text-center text-left">
             {items.filter(i => i.categoria === 'principal').map((item) => (
-              <ServicioCard 
-                key={item._id} 
-                item={item} 
-                isAdmin={isAdminMode} 
-                onUpdate={updateItem} 
-                onDelete={(id) => deleteItem(id, 'servicios')} 
+              <ServicioCard
+                key={item._id}
+                item={item}
+                isAdmin={isAdminMode}
+                onUpdate={updateItem}
+                onDelete={(id) => deleteItem(id, 'servicios')}
               />
             ))}
             {isAdminMode && (
               <button onClick={() => addItem('principal')} className="border-4 border-dashed rounded-[3rem] p-12 text-slate-300 no-print flex items-center justify-center hover:text-indigo-500 transition-all">
-                <Plus size={48}/>
+                <Plus size={48} />
               </button>
             )}
           </div>
@@ -322,7 +323,7 @@ export default function App() {
         <section id="web" className="py-20 md:py-32 px-4 md:px-6 max-w-7xl mx-auto text-left">
           <div className="flex justify-between items-end mb-12 border-b border-indigo-500/20 pb-4">
             <h3 className="text-3xl md:text-5xl font-black tracking-tighter uppercase italic">Webs <span className="text-indigo-500 text-left">Corporativas</span></h3>
-            {isAdminMode && <button onClick={() => addItem('web')} className="bg-indigo-500 p-2 rounded-full text-white shadow-xl no-print"><Plus size={20}/></button>}
+            {isAdminMode && <button onClick={() => addItem('web')} className="bg-indigo-500 p-2 rounded-full text-white shadow-xl no-print"><Plus size={20} /></button>}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
             {items.filter(i => i.categoria === 'web').map((item) => (
@@ -335,7 +336,7 @@ export default function App() {
         <section id="landing" className="py-20 md:py-32 px-4 md:px-6 max-w-7xl mx-auto bg-slate-900/5 dark:bg-white/5 rounded-[3rem] md:rounded-[5rem] mb-20">
           <div className="flex justify-between items-end mb-12 border-b border-rose-500/20 pb-4 px-4 text-left">
             <h3 className="text-3xl md:text-5xl font-black tracking-tighter uppercase italic text-rose-500 text-left">Landing Pages</h3>
-            {isAdminMode && <button onClick={() => addItem('landing')} className="bg-rose-500 p-2 rounded-full text-white shadow-xl no-print"><Plus size={20}/></button>}
+            {isAdminMode && <button onClick={() => addItem('landing')} className="bg-rose-500 p-2 rounded-full text-white shadow-xl no-print"><Plus size={20} /></button>}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-4">
             {items.filter(i => i.categoria === 'landing').map((item) => (
@@ -353,7 +354,7 @@ export default function App() {
           <Marquee speed={35} pauseOnHover gradient={false}>
             {resenas.map((r) => (
               <div key={r._id} className="mx-4 p-8 bg-white dark:bg-white/5 border border-white/10 rounded-[3rem] w-[320px] md:w-[450px] relative shadow-2xl text-left">
-                {isAdminMode && <button onClick={() => deleteItem(r._id, 'resenas')} className="absolute top-6 right-6 text-rose-500 hover:scale-125 transition-all text-left"><Trash2 size={20}/></button>}
+                {isAdminMode && <button onClick={() => deleteItem(r._id, 'resenas')} className="absolute top-6 right-6 text-rose-500 hover:scale-125 transition-all text-left"><Trash2 size={20} /></button>}
                 <div className="flex gap-1 mb-4 text-yellow-500 text-left">
                   {[...Array(5)].map((_, i) => (<Star key={i} size={18} fill={i < r.estrellas ? "currentColor" : "none"} className={i < r.estrellas ? "" : "text-slate-300 dark:text-slate-700"} />))}
                 </div>
@@ -371,7 +372,7 @@ export default function App() {
         <section id="contacto" className="py-20 md:py-40 px-6 max-w-7xl mx-auto z-10 relative">
           <div className="grid lg:grid-cols-2 gap-16 items-start">
             <div className="text-left">
-              <h2 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter mb-12 text-indigo-500 text-left">Preguntas <br/> Frecuentes</h2>
+              <h2 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter mb-12 text-indigo-500 text-left">Preguntas <br /> Frecuentes</h2>
               <div className="space-y-2">
                 {faqs.map((faq, index) => (
                   <FAQItem key={index} question={faq.q} answer={faq.a} />
@@ -382,41 +383,48 @@ export default function App() {
               <h2 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter mb-12 text-indigo-500 lg:text-right">Hablemos</h2>
               <form onSubmit={enviarConsultaBackend} className="grid gap-6 bg-white dark:bg-zinc-900/50 p-8 md:p-12 rounded-[3rem] border border-zinc-200 dark:border-white/10 shadow-2xl">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-                  <input value={form.nombre} onChange={e => setForm({...form, nombre: e.target.value})} required className="w-full bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-white/10 p-6 rounded-3xl outline-none focus:border-indigo-500 font-bold" placeholder="NOMBRE COMPLETO" />
-                  <input type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} required className="w-full bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-white/10 p-6 rounded-3xl outline-none focus:border-indigo-500 font-bold" placeholder="TU EMAIL" />
+                  <input value={form.nombre} onChange={e => setForm({ ...form, nombre: e.target.value })} required className="w-full bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-white/10 p-6 rounded-3xl outline-none focus:border-indigo-500 font-bold" placeholder="NOMBRE COMPLETO" />
+                  <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required className="w-full bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-white/10 p-6 rounded-3xl outline-none focus:border-indigo-500 font-bold" placeholder="TU EMAIL" />
                 </div>
-                <textarea value={form.mensaje} onChange={e => setForm({...form, mensaje: e.target.value})} required className="w-full bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-white/10 p-6 rounded-3xl h-40 outline-none focus:border-indigo-500 font-bold resize-none" placeholder="DETALLES DEL PROYECTO" />
+                <textarea value={form.mensaje} onChange={e => setForm({ ...form, mensaje: e.target.value })} required className="w-full bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-white/10 p-6 rounded-3xl h-40 outline-none focus:border-indigo-500 font-bold resize-none" placeholder="DETALLES DEL PROYECTO" />
                 <button disabled={enviando} className="w-full bg-indigo-600 text-white py-6 rounded-3xl font-black uppercase text-[12px] tracking-[0.2em] italic hover:bg-indigo-700 transition-all flex items-center justify-center gap-3 shadow-xl">
-                  {enviando ? "Procesando..." : <><Send size={18}/> Solicitar Propuesta de Proyecto</>}
+                  {enviando ? "Procesando..." : <><Send size={18} /> Solicitar Propuesta de Proyecto</>}
                 </button>
               </form>
             </div>
           </div>
         </section>
 
-        {/* FOOTER */}
+        {/* FOOTER - LIMPICAR Y PROFESIONAL */}
         <footer className="bg-black/20 backdrop-blur-3xl border-t border-white/10 py-20 px-6 no-print">
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12 text-left">
+
+            {/* LOGO Y ESlogan */}
             <div className="text-center md:text-left">
-              <h2 className="text-2xl font-black italic uppercase flex items-center gap-2 mb-4 justify-center md:justify-start text-left">
-                <Rocket className="text-indigo-500" /> EMPRE<span className="text-indigo-500 text-left">WEB</span>
+              <h2 className="text-2xl font-black italic uppercase flex items-center gap-2 mb-4 justify-center md:justify-start">
+                <Rocket className="text-indigo-500" />
+                <span>EMPREWEB</span>
               </h2>
-              <p className="text-slate-500 text-xs max-w-xs uppercase tracking-widest font-bold">Ingeniería Digital Profesional • Talagante, Chile</p>
+              <p className="text-slate-500 text-xs max-w-xs uppercase tracking-widest font-bold">
+                Ingeniería Digital Profesional • Talagante, Chile
+              </p>
             </div>
-            <div className="flex gap-8 text-slate-400">
-               <a href="https://wa.me/56977922875" className="hover:text-indigo-500 transition-colors"><MessageCircle size={24}/></a>
-               <a href="https://instagram.com" className="hover:text-indigo-500 transition-colors"><Instagram size={24}/></a>
-               <a href="https://github.com" className="hover:text-indigo-500 transition-colors"><Github size={24}/></a>
-            </div>
+
+            {/* SECCIÓN DERECHA - COPYRIGHT Y TAGLINE */}
             <div className="text-center md:text-right">
-              <p className="text-[9px] font-black uppercase tracking-[0.5em] opacity-30 italic">© 2026 EMPREWEB STUDIO CHILE</p>
-              <p className="text-[7px] font-bold text-indigo-500/50 uppercase tracking-[0.2em] mt-2">Tecnología de Vanguardia</p>
+              <p className="text-[9px] font-black uppercase tracking-[0.5em] opacity-30 italic">
+                © 2026 EMPREWEB STUDIO CHILE
+              </p>
+              <p className="text-[7px] font-bold text-indigo-500/50 uppercase tracking-[0.2em] mt-2">
+                Tecnología de Vanguardia
+              </p>
             </div>
+
           </div>
         </footer>
 
         {!isLogged && <div onClick={() => setShowLogin(true)} className="fixed bottom-0 left-0 w-24 h-24 cursor-default z-[100] opacity-0 text-left no-print" title="Admin Login" />}
-        
+
         {/* MODALES */}
         <AnimatePresence>
           {showResenaForm && (
@@ -473,12 +481,12 @@ const PriceCard = ({ item, isAdmin, onUpdate, onDelete, color = "indigo" }) => {
     <motion.div whileHover={{ y: -8 }} className={`price-card bg-white/40 dark:bg-white/5 backdrop-blur-lg border border-slate-200 dark:border-white/10 p-8 md:p-12 rounded-[3.5rem] md:rounded-[4.5rem] flex flex-col h-full border-b-[12px] md:border-b-[16px] ${currentTheme} transition-all shadow-2xl text-left text-left text-left`}>
       {isAdmin ? (
         <div className="space-y-4 text-left">
-          <input className="w-full bg-black/20 p-3 rounded-2xl text-xs text-white outline-none border border-white/5 focus:border-indigo-500 text-left text-left" value={localEdit.titulo} onChange={e => setLocalEdit({...localEdit, titulo: e.target.value})} />
-          <input className="w-full bg-black/20 p-3 rounded-2xl text-xs font-black text-indigo-500 outline-none border border-white/5 focus:border-indigo-500 text-left text-left" value={localEdit.precio} onChange={e => setLocalEdit({...localEdit, precio: e.target.value})} />
-          <textarea className="w-full bg-black/20 p-3 rounded-2xl text-xs h-24 text-white outline-none border border-white/5 focus:border-indigo-500 text-left text-left" value={localEdit.desc} onChange={e => setLocalEdit({...localEdit, desc: e.target.value})} />
+          <input className="w-full bg-black/20 p-3 rounded-2xl text-xs text-white outline-none border border-white/5 focus:border-indigo-500 text-left text-left" value={localEdit.titulo} onChange={e => setLocalEdit({ ...localEdit, titulo: e.target.value })} />
+          <input className="w-full bg-black/20 p-3 rounded-2xl text-xs font-black text-indigo-500 outline-none border border-white/5 focus:border-indigo-500 text-left text-left" value={localEdit.precio} onChange={e => setLocalEdit({ ...localEdit, precio: e.target.value })} />
+          <textarea className="w-full bg-black/20 p-3 rounded-2xl text-xs h-24 text-white outline-none border border-white/5 focus:border-indigo-500 text-left text-left" value={localEdit.desc} onChange={e => setLocalEdit({ ...localEdit, desc: e.target.value })} />
           <div className="flex gap-2 text-left">
             <button onClick={() => onUpdate(item._id, localEdit)} className="flex-1 bg-green-600 text-white py-3 rounded-2xl text-[10px] font-bold uppercase transition-all hover:bg-green-700 text-left text-center">GUARDAR CAMBIOS</button>
-            <button onClick={() => onDelete(item._id)} className="bg-rose-600 text-white px-4 rounded-2xl transition-all hover:bg-rose-700 text-left text-left text-left"><Trash2 size={16}/></button>
+            <button onClick={() => onDelete(item._id)} className="bg-rose-600 text-white px-4 rounded-2xl transition-all hover:bg-rose-700 text-left text-left text-left"><Trash2 size={16} /></button>
           </div>
         </div>
       ) : (
