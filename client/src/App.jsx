@@ -244,7 +244,6 @@ export default function App() {
         {/* HERO */}
         <header id="inicio" className="pt-44 pb-32 px-6 max-w-7xl mx-auto grid lg:grid-cols-2 items-center gap-12 text-left">
           <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }} className="z-10 text-left">
-            <span className="bg-rose-500/10 text-rose-500 px-3 py-1.5 rounded-full text-[9px] font-black tracking-widest uppercase mb-4 inline-block">Ingeniería Digital 2026</span>
             <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-[1.1] mb-8">
               Tu <br />
               <div className="inline-block relative">
