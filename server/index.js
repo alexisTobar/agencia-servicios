@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
+const https = require('https'); // Librería nativa para el script de despertar
 require('dotenv').config();
 
 const app = express();
@@ -9,7 +10,6 @@ app.use(cors());
 app.use(express.json());
 
 // --- CONEXIÓN A MONGODB ---
-// Revisa que en Render tengas la variable MONGO_URI
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ Conectado exitosamente a MongoDB Atlas"))
   .catch(err => {
@@ -44,17 +44,14 @@ const Contacto = mongoose.model('Contacto', new mongoose.Schema({
 const auth = (req, res, next) => {
   try {
     const token = req.headers['authorization'];
-    // Usa JWT_SECRET de Render o un fallback por si lo olvidaste
     jwt.verify(token, process.env.JWT_SECRET || 'clave_secreta_temporal');
     next();
   } catch (e) { res.status(401).send("No autorizado"); }
 };
 
-// --- RUTA DE LOGIN (REPARADA PARA RENDER) ---
+// --- RUTA DE LOGIN ---
 app.post('/api/login', (req, res) => {
   const { password } = req.body;
-  
-  // Compara contra la variable "Value" que pusiste en Render
   if (password === process.env.ADMIN_PASSWORD) {
     const token = jwt.sign({ admin: true }, process.env.JWT_SECRET || 'clave_secreta_temporal');
     return res.json({ token });
@@ -99,6 +96,18 @@ app.post('/api/contacto', async (req, res) => {
     }
 });
 
-// PUERTO DINÁMICO
+// --- PUERTO DINÁMICO ---
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Servidor activo en puerto ${PORT}`));
+app.listen(PORT, () => {
+    console.log(`🚀 Servidor EMPREWEB activo en puerto ${PORT}`);
+    
+    // SCRIPT KEEP-ALIVE: Se ejecuta justo después de encender el servidor
+    const URL = "https://agencia-servicios.onrender.com/api/servicios"; // Tu URL de Render
+    setInterval(() => {
+        https.get(URL, (res) => {
+            console.log(`📡 Auto-Ping enviado para mantener despierto: ${res.statusCode}`);
+        }).on('error', (err) => {
+            console.error(`❌ Error en el Auto-Ping: ${err.message}`);
+        });
+    }, 13 * 60 * 1000); // Cada 13 minutos
+});
