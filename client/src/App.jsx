@@ -12,6 +12,12 @@ import {
 
 const API_URL = "https://agencia-servicios.onrender.com/api";
 
+// --- ANIMACIÓN PARA TEXTOS DESCRIPTIVOS ---
+const textVariant = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+};
+
 // --- FONDO PARALLAX PROFESIONAL ---
 const Background = () => {
   const { scrollY } = useScroll();
@@ -215,11 +221,11 @@ export default function App() {
 
         {/* NAVBAR */}
         <nav className="fixed top-0 w-full z-[80] bg-white/10 dark:bg-black/20 backdrop-blur-xl border-b border-white/10 p-4 no-print text-left">
-          <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <div className="max-w-7xl mx-auto flex justify-between items-center text-left">
             <h1 className="text-xl md:text-2xl font-black italic uppercase">
               <Rocket className="inline mr-2 text-indigo-500" /> EMPREWEB
             </h1>
-            <div className="hidden md:flex gap-8 text-[10px] font-black uppercase tracking-widest">
+            <div className="hidden md:flex gap-8 text-[10px] font-black uppercase tracking-widest text-left">
               <a href="#servicios-principales">Servicios</a>
               <a href="#web">Planes</a>
               <a href="#resenas">Clientes</a>
@@ -244,11 +250,12 @@ export default function App() {
         {/* HERO */}
         <header id="inicio" className="pt-44 pb-32 px-6 max-w-7xl mx-auto grid lg:grid-cols-2 items-center gap-12 text-left">
           <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }} className="z-10 text-left">
+            <span className="bg-rose-500/10 text-rose-500 px-3 py-1.5 rounded-full text-[9px] font-black tracking-widest uppercase mb-4 inline-block">Ingeniería Digital 2026</span>
             <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-[1.1] mb-8">
               Tu <br />
               <div className="inline-block relative">
                 <AnimatePresence mode="wait">
-                  <motion.span key={palabras[indexPalabra]} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4 }} className="block text-7xl md:text-9xl text-indigo-500 font-black italic leading-none py-4 no-print">
+                  <motion.span key={palabras[indexPalabra]} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4 }} className="block text-7xl md:text-9xl text-indigo-500 font-black italic leading-none py-4 no-print text-left text-left">
                     {palabras[indexPalabra]}
                   </motion.span>
                 </AnimatePresence>
@@ -262,8 +269,8 @@ export default function App() {
               <a href="#contacto" className="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black uppercase text-xs shadow-xl hover:bg-indigo-700 transition-all">Comenzar ahora</a>
             </div>
           </motion.div>
-          <motion.div animate={{ y: [0, -30, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} className="flex justify-center no-print">
-            <img src="https://i.postimg.cc/DwGDHxxH/Copilot-20260115-120913.png" alt="Hero" className="w-full h-auto object-contain lg:scale-150 drop-shadow-2xl" />
+          <motion.div animate={{ y: [0, -30, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} className="flex justify-center no-print text-left">
+            <img src="https://i.postimg.cc/DwGDHxxH/Copilot-20260115-120913.png" alt="Hero" className="w-full h-auto object-contain lg:scale-150 drop-shadow-2xl text-left" />
           </motion.div>
         </header>
 
@@ -273,8 +280,11 @@ export default function App() {
 
         {/* SERVICIOS PRINCIPALES */}
         <section id="servicios-principales" className="py-24 px-6 max-w-7xl mx-auto text-left">
-          <div className="text-center mb-20">
-            <h3 className="text-3xl md:text-5xl font-black tracking-tighter uppercase italic">Mis Servicios <span className="text-rose-500 underline decoration-indigo-500 underline-offset-8">Principales</span></h3>
+          <div className="text-center mb-20 text-left">
+            <h3 className="text-3xl md:text-5xl font-black tracking-tighter uppercase italic text-center">Mis Servicios <span className="text-rose-500 underline decoration-indigo-500 underline-offset-8">Principales</span></h3>
+            <motion.p variants={textVariant} initial="hidden" whileInView="visible" viewport={{ once: true }} className="mt-6 text-slate-500 dark:text-slate-400 font-bold italic max-w-2xl mx-auto text-center">
+              Soluciones integrales de alto rendimiento. Desde el código hasta la estrategia visual, cubrimos cada pilar técnico para asegurar el éxito de tu marca.
+            </motion.p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 text-center text-left">
             {items.filter(i => i.categoria === 'principal').map((item) => (
@@ -288,9 +298,14 @@ export default function App() {
 
         {/* PLANES WEB */}
         <section id="web" className="py-20 md:py-32 px-4 md:px-6 max-w-7xl mx-auto text-left">
-          <div className="flex justify-between items-end mb-12 border-b border-indigo-500/20 pb-4">
-            <h3 className="text-3xl md:text-5xl font-black tracking-tighter uppercase italic">Webs <span className="text-indigo-500 text-left">Corporativas</span></h3>
-            {isAdminMode && <button onClick={() => addItem('web')} className="bg-indigo-500 p-3 rounded-full text-white shadow-xl no-print"><Plus size={20} /></button>}
+          <div className="mb-16 border-b border-indigo-500/20 pb-8 text-left">
+            <div className="flex justify-between items-end text-left text-left">
+              <h3 className="text-3xl md:text-5xl font-black tracking-tighter uppercase italic">Webs <span className="text-indigo-500 text-left">Corporativas</span></h3>
+              {isAdminMode && <button onClick={() => addItem('web')} className="bg-indigo-500 p-3 rounded-full text-white shadow-xl no-print text-left"><Plus size={20} /></button>}
+            </div>
+            <motion.p variants={textVariant} initial="hidden" whileInView="visible" viewport={{ once: true }} className="mt-4 text-slate-500 dark:text-slate-400 font-bold italic max-w-3xl text-left">
+              Estructuras robustas para empresas que buscan autoridad. Diseñadas para proyectar confianza, profesionalismo y escalar junto a tu negocio.
+            </motion.p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
             {items.filter(i => i.categoria === 'web').map((item) => (
@@ -300,25 +315,35 @@ export default function App() {
         </section>
 
         {/* PLANES LANDING */}
-        <section id="landing" className="py-20 md:py-32 px-4 md:px-6 max-w-7xl mx-auto bg-slate-900/5 dark:bg-white/5 rounded-[3rem] md:rounded-[5rem] mb-20 text-left">
-          <div className="flex justify-between items-end mb-12 border-b border-rose-500/20 pb-4 px-4">
-            <h3 className="text-3xl md:text-5xl font-black tracking-tighter uppercase italic text-rose-500 text-left">Landing Pages</h3>
-            {isAdminMode && <button onClick={() => addItem('landing')} className="bg-rose-500 p-2 rounded-full text-white shadow-xl no-print"><Plus size={20} /></button>}
+        <section id="landing" className="py-20 md:py-32 px-4 md:px-6 max-w-7xl mx-auto bg-slate-900/5 dark:bg-white/5 rounded-[3rem] md:rounded-[5rem] mb-20 text-left text-left">
+          <div className="mb-16 border-b border-rose-500/20 pb-8 px-4 text-left text-left">
+            <div className="flex justify-between items-end text-left text-left">
+              <h3 className="text-3xl md:text-5xl font-black tracking-tighter uppercase italic text-rose-500 text-left">Landing Pages</h3>
+              {isAdminMode && <button onClick={() => addItem('landing')} className="bg-rose-500 p-2 rounded-full text-white shadow-xl no-print text-left"><Plus size={20} /></button>}
+            </div>
+            <motion.p variants={textVariant} initial="hidden" whileInView="visible" viewport={{ once: true }} className="mt-4 text-slate-500 dark:text-slate-400 font-bold italic max-w-3xl text-left">
+              Máxima conversión en tiempo récord. Sitios enfocados en un solo objetivo: transformar visitantes en clientes mediante ingeniería de ventas y UX.
+            </motion.p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-4 text-left">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-4 text-left text-left">
             {items.filter(i => i.categoria === 'landing').map((item) => (
               <PriceCard key={item._id} item={item} isAdmin={isAdminMode} onUpdate={updateItem} onDelete={() => deleteItem(item._id, 'servicios')} color="rose" />
             ))}
           </div>
         </section>
 
-        {/* --- SERVICIOS ADICIONALES (MANTENIDOS) --- */}
+        {/* --- SERVICIOS ADICIONALES --- */}
         <section id="adicional" className="py-20 px-4 md:px-6 max-w-7xl mx-auto text-left">
-          <div className="flex justify-between items-end mb-12 border-b border-orange-500/20 pb-8 text-left text-left">
-            <h3 className="text-3xl md:text-5xl font-black tracking-tighter uppercase italic text-orange-500">Servicios <span className="dark:text-white text-slate-900 font-black">Adicionales</span></h3>
-            {isAdminMode && <button onClick={() => addItem('adicional')} className="bg-orange-500 p-3 rounded-full text-white shadow-xl no-print"><Plus size={20}/></button>}
+          <div className="mb-16 border-b border-orange-500/20 pb-8 text-left text-left text-left">
+            <div className="flex justify-between items-end text-left">
+              <h3 className="text-3xl md:text-5xl font-black tracking-tighter uppercase italic text-orange-500 text-left">Servicios <span className="dark:text-white text-slate-900 font-black text-left">Adicionales</span></h3>
+              {isAdminMode && <button onClick={() => addItem('adicional')} className="bg-orange-500 p-3 rounded-full text-white shadow-xl no-print text-left"><Plus size={20}/></button>}
+            </div>
+            <motion.p variants={textVariant} initial="hidden" whileInView="visible" viewport={{ once: true }} className="mt-4 text-slate-500 dark:text-slate-400 font-bold italic max-w-3xl text-left text-left">
+              Potencia tu ecosistema digital. Complementos técnicos y creativos diseñados para mantener tu plataforma actualizada, segura y siempre competitiva.
+            </motion.p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
             {items.filter(i => i.categoria === 'adicional').map((item) => (
               <PriceCard key={item._id} item={item} isAdmin={isAdminMode} onUpdate={updateItem} onDelete={() => deleteItem(item._id, 'servicios')} color="orange" />
             ))}
@@ -328,7 +353,10 @@ export default function App() {
         {/* CASOS DE ÉXITO */}
         <section id="resenas" className="py-24 px-6 max-w-7xl mx-auto text-left overflow-hidden no-print text-left">
           <div className="flex flex-col md:flex-row justify-between items-center mb-16 gap-6 text-left">
-            <h3 className="text-3xl md:text-5xl font-black uppercase italic">Casos de <span className="text-indigo-500 text-left">Éxito</span></h3>
+            <div className="text-left text-left">
+              <h3 className="text-3xl md:text-5xl font-black uppercase italic text-left">Casos de <span className="text-indigo-500 text-left">Éxito</span></h3>
+              <p className="text-slate-500 dark:text-slate-400 font-bold italic text-left">Lo que dicen quienes ya confiaron en nuestra ingeniería.</p>
+            </div>
             <button onClick={() => setShowResenaForm(true)} className="bg-indigo-600 text-white px-8 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl transition-all hover:bg-indigo-700">Dejar mi reseña</button>
           </div>
           <Marquee speed={35} pauseOnHover gradient={false}>
@@ -339,7 +367,7 @@ export default function App() {
                   {[...Array(5)].map((_, i) => (<Star key={i} size={18} fill={i < r.estrellas ? "currentColor" : "none"} className={i < r.estrellas ? "" : "text-slate-300 dark:text-slate-700"} />))}
                 </div>
                 <p className="text-slate-500 dark:text-slate-300 italic text-base md:text-xl mb-8 leading-relaxed font-medium text-left">"{r.comentario}"</p>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 text-left">
                   <div className="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center font-black text-white text-left">{r.nombre.charAt(0)}</div>
                   <span className="font-black text-xs uppercase tracking-widest text-left">{r.nombre}</span>
                 </div>
@@ -348,22 +376,24 @@ export default function App() {
           </Marquee>
         </section>
 
-        {/* --- CONTACTO Y FAQ (REDISEÑADO Y MEJORADO) --- */}
-        <section id="contacto" className="py-20 md:py-40 px-6 max-w-7xl mx-auto z-10 relative">
-          <div className="grid lg:grid-cols-2 gap-16 items-start">
-            <div className="text-left text-left">
-              <h2 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter mb-12 text-indigo-500 text-left">Preguntas <br /> Frecuentes</h2>
+        {/* --- CONTACTO Y FAQ --- */}
+        <section id="contacto" className="py-20 md:py-40 px-6 max-w-7xl mx-auto z-10 relative text-left">
+          <div className="grid lg:grid-cols-2 gap-16 items-start text-left">
+            <div className="text-left text-left text-left">
+              <h2 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter mb-4 text-indigo-500 text-left">Preguntas <br /> Frecuentes</h2>
+              <p className="text-slate-500 dark:text-slate-400 font-bold italic mb-12 text-left">Resolvemos tus dudas técnicas de forma transparente.</p>
               <div className="space-y-2 text-left">
                 {faqs.map((faq, index) => (
                   <FAQItem key={index} question={faq.q} answer={faq.a} />
                 ))}
               </div>
             </div>
-            <div className="no-print">
-              <div className="relative p-1 rounded-[3rem] bg-gradient-to-br from-indigo-500/20 via-transparent to-rose-500/20">
-                <form onSubmit={enviarConsultaBackend} className="relative overflow-hidden bg-white/80 dark:bg-black/60 backdrop-blur-3xl p-10 md:p-14 rounded-[2.8rem] border border-white/20 shadow-2xl">
-                  <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter mb-10 text-indigo-500 text-left">Hablemos</h2>
-                  <div className="grid gap-6">
+            <div className="no-print text-left">
+              <div className="relative p-1 rounded-[3rem] bg-gradient-to-br from-indigo-500/20 via-transparent to-rose-500/20 text-left text-left">
+                <form onSubmit={enviarConsultaBackend} className="relative overflow-hidden bg-white/80 dark:bg-black/60 backdrop-blur-3xl p-10 md:p-14 rounded-[2.8rem] border border-white/20 shadow-2xl text-left">
+                  <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter mb-4 text-indigo-500 text-left">Hablemos</h2>
+                  <p className="text-slate-500 dark:text-slate-400 font-bold italic mb-10 text-left">Llevamos tu idea al siguiente nivel tecnológico.</p>
+                  <div className="grid gap-6 text-left">
                     <input value={form.nombre} onChange={e => setForm({ ...form, nombre: e.target.value })} required className="w-full bg-slate-100/50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 p-5 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold placeholder:opacity-50 text-left" placeholder="NOMBRE COMPLETO" />
                     <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required className="w-full bg-slate-100/50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 p-5 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold placeholder:opacity-50 text-left" placeholder="EMAIL" />
                     <textarea value={form.mensaje} onChange={e => setForm({ ...form, mensaje: e.target.value })} required className="w-full bg-slate-100/50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 p-5 rounded-2xl h-40 outline-none focus:border-indigo-500 transition-all font-bold resize-none placeholder:opacity-50 text-left" placeholder="DETALLES DEL PROYECTO" />
@@ -383,28 +413,27 @@ export default function App() {
         </section>
 
         {/* FOOTER */}
-        <footer className="bg-black/20 backdrop-blur-3xl border-t border-white/10 py-20 px-6 no-print text-left">
-          <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12">
+        <footer className="bg-black/20 backdrop-blur-3xl border-t border-white/10 py-20 px-6 no-print text-left text-left">
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12 text-left">
             <div className="text-center md:text-left text-left">
               <h2 className="text-2xl font-black italic uppercase flex items-center gap-2 mb-4 justify-center md:justify-start">
-                <Rocket className="text-indigo-500" />
+                <Rocket className="text-indigo-500 text-left" />
                 <span>EMPREWEB</span>
               </h2>
               <p className="text-slate-500 text-xs max-w-xs uppercase tracking-widest font-bold text-left">Ingeniería Digital Profesional • Talagante, Chile</p>
             </div>
-            <div className="text-center md:text-right text-left text-left">
-              <p className="text-[9px] font-black uppercase tracking-[0.5em] opacity-30 italic">© 2026 EMPREWEB STUDIO CHILE</p>
-              <p className="text-[7px] font-bold text-indigo-500/50 uppercase tracking-[0.2em] mt-2">Tecnología de Vanguardia</p>
+            <div className="text-center md:text-right text-left text-left text-left">
+              <p className="text-[9px] font-black uppercase tracking-[0.5em] opacity-30 italic text-left">© 2026 EMPREWEB STUDIO CHILE</p>
+              <p className="text-[7px] font-bold text-indigo-500/50 uppercase tracking-[0.2em] mt-2 text-left text-left">Tecnología de Vanguardia</p>
             </div>
           </div>
         </footer>
 
         {!isLogged && <div onClick={() => setShowLogin(true)} className="fixed bottom-0 left-0 w-24 h-24 cursor-default z-[100] opacity-0 text-left no-print" title="Admin Login" />}
 
-        {/* MODALES */}
         <AnimatePresence>
           {showResenaForm && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[110] bg-black/95 backdrop-blur-md flex items-center justify-center p-4 text-left">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[110] bg-black/95 backdrop-blur-md flex items-center justify-center p-4 text-left text-left">
               <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} className="bg-white dark:bg-[#0a0a0a] p-10 rounded-[3rem] w-full max-w-sm text-center border border-white/10 shadow-2xl text-left">
                 <button onClick={() => setShowResenaForm(false)} className="absolute top-8 right-8 text-slate-400 hover:text-rose-500 transition-all text-left"><X /></button>
                 <h4 className="text-xl md:text-2xl font-black mb-6 italic uppercase text-indigo-500 text-center">Nueva Reseña</h4>
@@ -425,9 +454,9 @@ export default function App() {
           )}
 
           {showLogin && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[120] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 text-left">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[120] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 text-left text-left">
               <div className="bg-white dark:bg-[#0a0a0a] p-10 rounded-[3rem] w-full max-w-sm text-center border border-white/10 shadow-2xl text-left text-left">
-                <Terminal size={40} className="mx-auto mb-6 text-indigo-500" />
+                <Terminal size={40} className="mx-auto mb-6 text-indigo-500 text-left" />
                 <h4 className="text-xl md:text-2xl font-black mb-6 italic uppercase text-indigo-500 text-center">Acceso Maestro</h4>
                 <input type="password" autoFocus className="bg-slate-100 dark:bg-white/5 w-full p-5 rounded-xl md:rounded-2xl mb-4 text-center font-black text-xl md:text-2xl text-slate-900 dark:text-white outline-none border-2 border-indigo-500/20 text-left" value={password} onChange={(e) => setPassword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleLogin()} />
                 <button onClick={handleLogin} className="w-full bg-indigo-600 py-4 rounded-xl font-black text-white uppercase tracking-widest text-xs transition-all hover:bg-indigo-700">Desbloquear</button>
@@ -441,7 +470,7 @@ export default function App() {
   );
 }
 
-// --- COMPONENTE DE TARJETA DE PRECIO (OPTIMIZADO) ---
+// --- COMPONENTE DE TARJETA DE PRECIO ---
 const PriceCard = ({ item, isAdmin, onUpdate, onDelete, color = "indigo" }) => {
   const [localEdit, setLocalEdit] = useState(item);
   const themeColors = { rose: "border-rose-500 text-rose-500", indigo: "border-indigo-500 text-indigo-500", orange: "border-orange-500 text-orange-500" };
